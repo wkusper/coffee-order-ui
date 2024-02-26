@@ -1,0 +1,80 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        body {
+            background-color: #cb943e;
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #000;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        a:last-child {
+            margin-bottom: 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #000;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        a:last-child {
+            margin-bottom: 0;
+        }
+        #links {
+            display: flex;
+            justify-content: flex-start;
+            gap: 15px;
+        }
+        .big_button {
+            position: relative;
+            left: 600px;
+            top: 200px;
+            display: inline-block;
+            padding: 50px 40px;
+            background-color: #98691d;
+            color: black;
+            text-align: center;
+            text-decoration: none;
+            font-size: 24px;
+            border-radius: 5px;
+
+            transition: background-color 0.3s;
+        }
+        .big_button:hover, .big_button:focus {
+            background-color: #88601b;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <a href="index.html">Coffee Order System</a>
+    <div id="links">
+        <a href="orderstatus.html"><b>Order Status</b></a>
+    </div>
+</nav>
+
+<a href="addBeverage.html" class="big_button">Start Your Order</a>
+</body>
+</html>
