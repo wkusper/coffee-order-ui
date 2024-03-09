@@ -102,8 +102,7 @@
 
     <script>
         function selectBeverage(beverage) {
-            sessionStorage.setItem('selectedBeverage', beverage);
-            window.location.href = 'addCondiment.html';
+            window.location.href = 'addCondiment.html?beverage=' + encodeURIComponent(beverage);
         }
     </script>
 </body>

@@ -89,35 +89,102 @@
     <nav>
         <a href="index.html">Coffee Order System</a>
         <div id="links">
-            <a href="orderstatus.html"><b>Order Status</b></a>
+            <a href="OrderStatus.html"><b>Order Status</b></a>
         </div>
     </nav>
 
     <h2>Choose Condiments</h2>
     <div id="condiments">
-        <button class="condiment-btn" data-condiment="Milk">Milk</button>
-        <button class="condiment-btn" data-condiment="Sugar">Sugar</button>
-        <button class="condiment-btn" data-condiment="Mocha">Mocha</button>
-        <button class="condiment-btn" data-condiment="Soy">Soy</button>
+        <button class="condiment-btn" onclick="addCartItem('Milk')">Milk</button>
+        <button class="condiment-btn" onclick="addCartItem('Whip')">Whip</button>
+        <button class="condiment-btn" onclick="addCartItem('Mocha')">Mocha</button>
+        <button class="condiment-btn" onclick="addCartItem('Soy')">Soy</button>
     </div>
     <h2>Your Cart</h2>
     <div id="cart">
     </div>
-    <button id="confirm-order-btn" onclick="window.location.href='confirmation.html'">Confirm Order</button>
+    <button id="confirm-order-btn" onclick="confirmOrder()">Confirm Order</button>
 <script>
-    window.addEventListener('DOMContentLoaded', (event) => {
-        const selectedBeverage = sessionStorage.getItem('selectedBeverage');
-        if (selectedBeverage) {
-            const cartElement = document.getElementById('cart');
+    window.onload = function() {
+        let urlParams = new URLSearchParams(window.location.search);
+        let beverage = urlParams.get('beverage');
 
-            const beverageButton = document.createElement('button');
-            beverageButton.textContent = selectedBeverage;
-            beverageButton.className = 'condiment-btn';
-            beverageButton.onclick = function() {
-                sessionStorage.removeItem('selectedBeverage');
-                window.location.href = 'addBeverage.html';
+        if (beverage) {
+            let cart = document.getElementById("cart");
+            let beverageItem = document.createElement("div");
+            beverageItem.textContent = beverage;
+            beverageItem.classList.add("cart-item");
+            beverageItem.onclick = function() {
+                cart.removeChild(this);
+                window.location.href = "selectBeverage.html";
             };
-
-            cartElement.prepend(beverageButton);
+            cart.insertBefore(beverageItem, cart.firstChild);
         }
-    });
+    };
+
+    function addCartItem(condiment) {
+        let cart = document.getElementById("cart");
+        let cartItems = cart.children;
+        let cartCheck = false;
+        for (let i = 0; i < cartItems.length; i++) {
+            if (cartItems[i].textContent === condiment) {
+                cart.removeChild(cartItems[i]);
+                cartCheck = true;
+                break;
+            }
+        }
+
+        if (!cartCheck) {
+            let newItem = document.createElement("div");
+            newItem.textContent = condiment;
+            newItem.classList.add("cart-item");
+            newItem.onclick = function() {
+                cart.removeChild(this);
+            };
+            cart.appendChild(newItem);
+        }
+    }
+
+    let host = "http://localhost:8082";
+
+    async function confirmOrder() {
+        let cart = document.getElementById("cart");
+        let cartItems = [...cart.children];
+        let beverage = cartItems.shift().textContent;
+        let condiments = cartItems.map(item => item.textContent);
+
+        let orderData = {
+            beverage: beverage,
+            condiments: condiments
+        };
+
+        let request = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(orderData)
+        };
+
+        try {
+                let response = await fetch(host + "/orders", request);
+                if (response.status == 201) {
+                    let receiptData = await response.json();
+                    sessionStorage.setItem('receipt', JSON.stringify(receiptData));
+                    const queryParams = new URLSearchParams({
+                        beverage: beverage,
+                        condiments: condiments.join(',')
+                    });
+                    window.location.href = "confirmation.html?" + queryParams.toString();
+            } else {
+                console.log(response);
+                alert("Error: Unable to confirm order.");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Error: Unable to confirm order.");
+        }
+    }
+</script>
+    </body>
+</html>

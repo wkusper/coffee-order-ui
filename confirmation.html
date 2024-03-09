@@ -63,36 +63,45 @@
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const receiptElement = document.getElementById('receipt');
-            const selectedBeverage = sessionStorage.getItem('selectedBeverage');
-            const selectedCondiments = JSON.parse(sessionStorage.getItem('selectedCondiments') || '[]');
-            const orderId = '01';
-            const price = '$5';
-
-            let orderIdElement = document.createElement('div');
-            orderIdElement.textContent = `Order ID: ${orderId}`;
-            orderIdElement.classList.add('receipt-line');
-            receiptElement.appendChild(orderIdElement);
-
-
-            let beverageElement = document.createElement('div');
-            beverageElement.textContent = `Beverage: ${selectedBeverage}`;
-            beverageElement.classList.add('receipt-line');
-            receiptElement.appendChild(beverageElement);
-
-            if (selectedCondiments.length > 0) {
-                let condimentsElement = document.createElement('div');
-                condimentsElement.textContent = `Condiments: ${selectedCondiments.join(', ')}`;
-                condimentsElement.classList.add('receipt-line');
-                receiptElement.appendChild(condimentsElement);
-            }
-
-            let priceElement = document.createElement('div');
-            priceElement.textContent = `Price: ${price}`;
-            priceElement.classList.add('receipt-line');
-            receiptElement.appendChild(priceElement);
+        window.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const beverage = urlParams.get('beverage');
+            const condiments = urlParams.get('condiments');
+    
+            const orderDetails = getOrderDetails(beverage, condiments);
+            document.getElementById('order-details').textContent = orderDetails;
+    
+            fetchOrderDetails(beverage, condiments);
         });
+    
+        function getOrderDetails(beverage, condiments) {
+            return `Beverage: ${beverage}, Condiments: ${condiments || 'None'}`;
+        }
+    
+        function fetchOrderDetails(beverage, condiments) {
+            const orderData = {
+                beverage: beverage,
+                condiments: condiments.split(',')
+            };
+    
+            fetch('http://localhost:8082/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    setConfirmationDetails(data);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    
+        function setConfirmationDetails(orderData) {
+            document.getElementById("order-id").textContent = `Order ID: ${orderData.id}`;
+            document.getElementById("order-total").textContent = `Order Total: $${orderData.cost.toFixed(2)}`;
+        }
     </script>
 </body>
 </html>
